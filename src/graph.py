@@ -11,7 +11,7 @@ must be created first.
 from typing import Dict, List
 from langgraph.graph import StateGraph, START, END
 from langchain_core.documents import Document
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
 from src.state import State
 from src.prompts import BASELINE_PROMPT

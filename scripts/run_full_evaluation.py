@@ -33,10 +33,10 @@ import pandas as pd
 from datasets import load_dataset
 
 # LangChain
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.documents import Document
-from langchain.retrievers import EnsembleRetriever
-from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
+from langchain_classic.retrievers import EnsembleRetriever
+from langchain_classic.retrievers import ContextualCompressionRetriever
 from langchain_community.retrievers import BM25Retriever
 
 # LangChain Integrations
