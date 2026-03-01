@@ -40,8 +40,6 @@ from langchain_community.document_loaders import DirectoryLoader, PyMuPDFLoader
 from langchain_core.documents import Document
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from ragas.embeddings import LangchainEmbeddingsWrapper
-from ragas.llms import LangchainLLMWrapper
 from ragas.testset import TestsetGenerator
 
 # Config (paths, models, knobs)
@@ -207,17 +205,12 @@ TransientErr = (RateLimitError, APITimeoutError, APIStatusError, APIConnectionEr
     retry=retry_if_exception_type(TransientErr),
 )
 def build_testset(docs, size: int):
-    # --- Standard approach for ragas 0.2.x (current: 0.2.10) ---
-    # This is the ACTIVE code path as of ragas 0.2.10
-    # NOTE:  for 0.3.x certain approaches as use of LangChainEmbeddingsWrapper and LangchainLLMWrapper are deprecated
-
-    llm = LangchainLLMWrapper(
-        ChatOpenAI(model="gpt-4.1-mini", temperature=0, timeout=60, max_retries=6)
-    )
-    emb = LangchainEmbeddingsWrapper(
-        OpenAIEmbeddings(model="text-embedding-3-small", timeout=60, max_retries=6)
-    )
-    gen = TestsetGenerator(llm=llm, embedding_model=emb)
+    # --- RAGAS 0.4.x approach: use from_langchain() class method ---
+    # TestsetGenerator.from_langchain() is the official LangChain integration path
+    # and handles wrapping internally.
+    lc_llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0, timeout=60, max_retries=6)
+    lc_emb = OpenAIEmbeddings(model="text-embedding-3-small", timeout=60, max_retries=6)
+    gen = TestsetGenerator.from_langchain(lc_llm, lc_emb)
     return gen.generate_with_langchain_docs(docs, testset_size=size)
 
 

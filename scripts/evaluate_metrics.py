@@ -11,16 +11,16 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from openai import OpenAI
 from ragas import EvaluationDataset, RunConfig, evaluate
-from ragas.metrics import (
+from ragas.metrics.collections import (
     Faithfulness,
-    ResponseRelevancy,
+    AnswerRelevancy,
     ContextPrecision,
-    LLMContextRecall,
+    ContextRecall,
 )
-from ragas.llms import LangchainLLMWrapper
-
-from src.config import get_llm
+from ragas.llms import llm_factory
+from ragas.embeddings import OpenAIEmbeddings as RagasOpenAIEmbeddings
 
 OUT_DIR = Path(__file__).parent.parent / "data" / "processed"
 
@@ -35,7 +35,11 @@ if not input_files:
         "No input parquets found! Run Step 1 evaluating_inference.py first."
     )
 
-evaluator_llm = LangchainLLMWrapper(get_llm())
+openai_client = OpenAI()
+evaluator_llm = llm_factory("gpt-4.1-mini", client=openai_client)
+evaluator_emb = RagasOpenAIEmbeddings(
+    client=openai_client, model="text-embedding-3-small"
+)
 run_cfg = RunConfig(timeout=360)
 results = {}
 
@@ -49,12 +53,11 @@ for input_file in input_files:
     res = evaluate(
         dataset=eval_ds,
         metrics=[
-            Faithfulness(),
-            ResponseRelevancy(),
-            ContextPrecision(),
-            LLMContextRecall(),
+            Faithfulness(llm=evaluator_llm),
+            AnswerRelevancy(llm=evaluator_llm, embeddings=evaluator_emb),
+            ContextPrecision(llm=evaluator_llm, name="context_precision"),
+            ContextRecall(llm=evaluator_llm),
         ],
-        llm=evaluator_llm,
         run_config=run_cfg,
     )
 

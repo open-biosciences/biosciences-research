@@ -117,7 +117,7 @@ biosciences-research/
 
 - **LangGraph** 0.6.7 — RAG pipeline orchestration (`START → retrieve → generate → END`)
 - **LangChain** — Document loading, retriever abstractions, prompt templates
-- **RAGAS** 0.2.10 — Retrieval-augmented generation evaluation metrics
+- **RAGAS** 0.4.3 — Retrieval-augmented generation evaluation metrics
 - **Qdrant** — Vector store for dense retrieval
 - **OpenAI** — gpt-4.1-mini (generation), text-embedding-3-small (embeddings)
 - **Cohere** — rerank-v3.5 for contextual compression retrieval
