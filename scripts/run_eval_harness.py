@@ -51,7 +51,7 @@ from src.utils import (
 )
 from src.config import create_vector_store, get_llm
 from src.retrievers import create_retrievers
-from src.graph import build_all_graphs
+from src.graph import build_all_graphs, invoke_for_benchmark
 
 
 # ==============================================================================
@@ -196,7 +196,7 @@ for name, graph in graphs.items():
     # Run inference
     for idx, row in df.iterrows():
         q = row["user_input"]
-        result = graph.invoke({"question": q})
+        result = invoke_for_benchmark(graph, q)
         df.at[idx, "response"] = result["response"]
         df.at[idx, "retrieved_contexts"] = [d.page_content for d in result["context"]]
 
