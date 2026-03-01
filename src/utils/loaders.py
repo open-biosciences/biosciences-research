@@ -15,7 +15,7 @@ from langchain_core.documents import Document
 def load_documents_from_huggingface(
     dataset_name: str = "open-biosciences/biosciences-sources",
     split: str = "train",
-    revision: str = None
+    revision: str = None,
 ) -> List[Document]:
     """
     Load documents from HuggingFace dataset and convert to LangChain Documents.
@@ -52,7 +52,9 @@ def load_documents_from_huggingface(
     effective_revision = revision or os.getenv("HF_SOURCES_REV")
 
     # Load dataset from HuggingFace
-    sources_dataset = load_dataset(dataset_name, split=split, revision=effective_revision)
+    sources_dataset = load_dataset(
+        dataset_name, split=split, revision=effective_revision
+    )
 
     # Convert to LangChain Documents
     documents = []
@@ -78,7 +80,7 @@ def load_documents_from_huggingface(
 def load_golden_testset_from_huggingface(
     dataset_name: str = "open-biosciences/biosciences-golden-testset",
     split: str = "train",
-    revision: str = None
+    revision: str = None,
 ):
     """
     Load golden testset from HuggingFace dataset.

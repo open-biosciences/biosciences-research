@@ -49,33 +49,28 @@ def generate_manifest(
     # Import here to get actual versions
     try:
         import ragas
+
         ragas_version = ragas.__version__
     except ImportError:
         ragas_version = "unknown"
 
-    try:
-        python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
-    except:
-        python_version = "unknown"
+    python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
 
     manifest = {
         "ragas_version": ragas_version,
         "python_version": python_version,
-
         "llm": {
             "model": OPENAI_MODEL_NAME,  # Dynamic from src.config
             "temperature": 0,
             "provider": "openai",
-            "purpose": "RAG generation and RAGAS evaluation"
+            "purpose": "RAG generation and RAGAS evaluation",
         },
-
         "embeddings": {
             "model": EMBEDDING_MODEL_NAME,  # Dynamic from src.config
             "dimensions": 1536,
             "provider": "openai",
-            "purpose": "Document and query embeddings"
+            "purpose": "Document and query embeddings",
         },
-
         "retrievers": [
             {
                 "name": "naive",
@@ -83,14 +78,14 @@ def generate_manifest(
                 "description": "Baseline dense vector search with OpenAI embeddings",
                 "k": 5,
                 "distance_metric": "cosine",
-                "rerank": False
+                "rerank": False,
             },
             {
                 "name": "bm25",
                 "type": "sparse_keyword",
                 "description": "BM25 sparse keyword matching (lexical)",
                 "k": 5,
-                "rerank": False
+                "rerank": False,
             },
             {
                 "name": "cohere_rerank",
@@ -100,7 +95,7 @@ def generate_manifest(
                 "top_n": 3,
                 "rerank_model": "rerank-v3.5",
                 "rerank_provider": "cohere",
-                "rerank": True
+                "rerank": True,
             },
             {
                 "name": "ensemble",
@@ -110,10 +105,9 @@ def generate_manifest(
                 "sparse_k": 5,
                 "weights": [0.5, 0.5],
                 "components": ["naive_dense", "bm25_sparse"],
-                "rerank": False
-            }
+                "rerank": False,
+            },
         ],
-
         "evaluation": {
             "golden_testset": "open-biosciences/biosciences-golden-testset",
             "golden_testset_size": 12,  # Note: Actual size, RAGAS may generate more than requested
@@ -123,34 +117,27 @@ def generate_manifest(
                 "faithfulness",
                 "answer_relevancy",
                 "context_precision",
-                "context_recall"
+                "context_recall",
             ],
             "timeout_seconds": 360,
-            "ragas_run_config": {
-                "timeout": 360,
-                "max_workers": 4
-            }
+            "ragas_run_config": {"timeout": 360, "max_workers": 4},
         },
-
         "vector_store": {
             "type": "qdrant",
             "collection_name": COLLECTION_NAME,  # Dynamic from src.config
             "host": QDRANT_HOST,  # Dynamic from src.config
             "port": QDRANT_PORT,  # Dynamic from src.config
             "distance": "cosine",
-            "vector_size": 1536
+            "vector_size": 1536,
         },
-
         "skipped": [],
-
         "notes": [
             "All LLM calls use temperature=0 for determinism",
             "Fine-tuned embeddings out of scope per instructor guidance",
-            "Evaluation follows RAGAS 0.2.10 API patterns from session08"
+            "Evaluation follows RAGAS 0.2.10 API patterns from session08",
         ],
-
         "generated_at": datetime.utcnow().isoformat() + "Z",
-        "generated_by": "scripts/generate_run_manifest.py"
+        "generated_by": "scripts/generate_run_manifest.py",
     }
 
     # Add evaluation results summary if provided
@@ -165,8 +152,18 @@ def generate_manifest(
                     "answer_relevancy": float(df["answer_relevancy"].mean()),
                     "context_precision": float(df["context_precision"].mean()),
                     "context_recall": float(df["context_recall"].mean()),
-                    "average": float(df[["faithfulness", "answer_relevancy",
-                                         "context_precision", "context_recall"]].mean().mean())
+                    "average": float(
+                        df[
+                            [
+                                "faithfulness",
+                                "answer_relevancy",
+                                "context_precision",
+                                "context_recall",
+                            ]
+                        ]
+                        .mean()
+                        .mean()
+                    ),
                 }
             except Exception as e:
                 results_summary[retriever_name] = {"error": str(e)}
@@ -179,7 +176,7 @@ def generate_manifest(
 
     # Write to file
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
 
     return manifest
@@ -187,7 +184,9 @@ def generate_manifest(
 
 if __name__ == "__main__":
     # Standalone execution
-    output_path = Path(__file__).parent.parent / "data" / "processed" / "RUN_MANIFEST.json"
+    output_path = (
+        Path(__file__).parent.parent / "data" / "processed" / "RUN_MANIFEST.json"
+    )
 
     manifest = generate_manifest(output_path)
 
@@ -198,5 +197,5 @@ if __name__ == "__main__":
     print(f"RAGAS version: {manifest['ragas_version']}")
     print(f"Python version: {manifest['python_version']}")
     print(f"Retrievers: {len(manifest['retrievers'])}")
-    print(f"\nManifest contains full configuration for reproducibility.")
+    print("\nManifest contains full configuration for reproducibility.")
     print("=" * 80)

@@ -89,8 +89,7 @@ def build_graph(retriever, llm=None, prompt_template: str = None):
         """
         docs_content = "\n\n".join(d.page_content for d in state.get("context", []))
         msgs = rag_prompt.format_messages(
-            question=state["question"],
-            context=docs_content
+            question=state["question"], context=docs_content
         )
         response = llm.invoke(msgs)
         return {"response": response.content}

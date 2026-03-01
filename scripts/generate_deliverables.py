@@ -63,16 +63,14 @@ def main():
     # 1. Convert evaluation inputs (Parquet → CSV)
     print("\n1️⃣  Converting evaluation inputs...")
     count = convert_parquet_to_csv(
-        "{retriever}_evaluation_inputs.parquet",
-        "{retriever}_evaluation_dataset.csv"
+        "{retriever}_evaluation_inputs.parquet", "{retriever}_evaluation_dataset.csv"
     )
     print(f"   ✅ Converted {count} evaluation input files")
 
     # 2. Convert evaluation metrics (Parquet → CSV)
     print("\n2️⃣  Converting evaluation metrics...")
     count = convert_parquet_to_csv(
-        "{retriever}_evaluation_metrics.parquet",
-        "{retriever}_detailed_results.csv"
+        "{retriever}_evaluation_metrics.parquet", "{retriever}_detailed_results.csv"
     )
     print(f"   ✅ Converted {count} evaluation metric files")
 
@@ -85,7 +83,7 @@ def main():
         df = pd.read_parquet(comp_parquet)
         df.to_csv(comp_csv, index=False)
         print(f"   ✓ {comp_parquet.name} → {comp_csv.name} ({len(df)} rows)")
-        print(f"   ✅ Converted comparative results")
+        print("   ✅ Converted comparative results")
     else:
         print(f"   ⚠️  {comp_parquet.name} not found")
 
@@ -101,16 +99,16 @@ def main():
         with open(manifest_src) as f:
             manifest = json.load(f)
 
-        print(f"   ✓ RUN_MANIFEST.json copied")
+        print("   ✓ RUN_MANIFEST.json copied")
         print(f"      - Timestamp: {manifest.get('generated_at', 'N/A')}")
-        retriever_names = [r['name'] for r in manifest.get('retrievers', [])]
+        retriever_names = [r["name"] for r in manifest.get("retrievers", [])]
         print(f"      - Retrievers: {', '.join(retriever_names)}")
-        print(f"   ✅ Manifest copied")
+        print("   ✅ Manifest copied")
     else:
-        print(f"   ⚠️  RUN_MANIFEST.json not found in data/processed/")
+        print("   ⚠️  RUN_MANIFEST.json not found in data/processed/")
 
     # Summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🎉 Deliverables generated successfully!")
     print(f"\n📊 Location: {DELIVERABLES_DIR}")
     print("\n✨ Next steps:")

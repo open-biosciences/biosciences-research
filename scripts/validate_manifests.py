@@ -18,7 +18,7 @@ import hashlib
 import json
 import sys
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Tuple
 
 
 def find_repo_root(start_path: Path) -> Path:
@@ -70,7 +70,9 @@ def validate_interim_manifest() -> Tuple[bool, list]:
         errors.append(f"❌ Interim manifest not found: {INTERIM_MANIFEST}")
         return False, errors
 
-    print(f"📄 Validating interim manifest: {INTERIM_MANIFEST.relative_to(PROJECT_ROOT)}")
+    print(
+        f"📄 Validating interim manifest: {INTERIM_MANIFEST.relative_to(PROJECT_ROOT)}"
+    )
 
     # Load manifest
     try:
@@ -158,7 +160,9 @@ def validate_run_manifest() -> Tuple[bool, list]:
     # Check if manifest exists
     if not RUN_MANIFEST.exists():
         # Not an error if we haven't run evaluation yet
-        print(f"ℹ️  RUN_MANIFEST not found (run 'make eval' to generate): {RUN_MANIFEST.relative_to(PROJECT_ROOT)}")
+        print(
+            f"ℹ️  RUN_MANIFEST not found (run 'make eval' to generate): {RUN_MANIFEST.relative_to(PROJECT_ROOT)}"
+        )
         return True, []
 
     print(f"\n📄 Validating RUN_MANIFEST: {RUN_MANIFEST.relative_to(PROJECT_ROOT)}")
@@ -196,7 +200,11 @@ def validate_run_manifest() -> Tuple[bool, list]:
             # Check SHA-256 hashes match
             datasets = ["sources", "golden_testset"]
             for dataset in datasets:
-                expected_hash = interim_manifest.get("fingerprints", {}).get(dataset, {}).get("jsonl_sha256")
+                expected_hash = (
+                    interim_manifest.get("fingerprints", {})
+                    .get(dataset, {})
+                    .get("jsonl_sha256")
+                )
                 actual_hash = run_manifest["data_provenance"].get(f"{dataset}_sha256")
 
                 if expected_hash == actual_hash:
@@ -208,7 +216,7 @@ def validate_run_manifest() -> Tuple[bool, list]:
                         f"      RUN_MANIFEST: {actual_hash}"
                     )
         else:
-            errors.append(f"❌ Cannot validate provenance: interim manifest not found")
+            errors.append("❌ Cannot validate provenance: interim manifest not found")
     else:
         print("   ⚠️  No data_provenance field in RUN_MANIFEST")
 
@@ -217,9 +225,9 @@ def validate_run_manifest() -> Tuple[bool, list]:
 
 def main():
     """Main validation workflow."""
-    print("="*60)
+    print("=" * 60)
     print("🔍 Manifest Validation")
-    print("="*60)
+    print("=" * 60)
 
     all_errors = []
 
@@ -232,16 +240,16 @@ def main():
     all_errors.extend(run_errors)
 
     # Summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     if all_errors:
         print(f"❌ Validation FAILED with {len(all_errors)} error(s):\n")
         for error in all_errors:
             print(f"   {error}")
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         return 1
     else:
         print("✅ All manifest validations passed!")
-        print("="*60)
+        print("=" * 60)
         return 0
 
 

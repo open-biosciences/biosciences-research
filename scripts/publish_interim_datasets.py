@@ -58,7 +58,7 @@ def update_manifest(sources_repo: str, golden_testset_repo: str):
     # Update lineage section
     manifest["lineage"]["hf"]["dataset_repo_id"] = {
         "sources": sources_repo,
-        "golden_testset": golden_testset_repo
+        "golden_testset": golden_testset_repo,
     }
     manifest["lineage"]["hf"]["pending_upload"] = False
     manifest["lineage"]["hf"]["uploaded_at"] = datetime.now(timezone.utc).isoformat()
@@ -67,7 +67,7 @@ def update_manifest(sources_repo: str, golden_testset_repo: str):
     with open(MANIFEST_PATH, "w") as f:
         json.dump(manifest, f, indent=2)
 
-    print(f"\n✅ Updated manifest.json with dataset repo IDs")
+    print("\n✅ Updated manifest.json with dataset repo IDs")
 
 
 def main():
@@ -94,50 +94,44 @@ def main():
 
     # Upload sources dataset
     print(f"\n📤 Uploading sources dataset to {SOURCES_DATASET_NAME}...")
-    sources_dataset.push_to_hub(
-        SOURCES_DATASET_NAME,
-        private=False,
-        token=hf_token
-    )
+    sources_dataset.push_to_hub(SOURCES_DATASET_NAME, private=False, token=hf_token)
 
     # Create and upload sources dataset card
-    print(f"   • Creating dataset card...")
+    print("   • Creating dataset card...")
     api.upload_file(
         path_or_fileobj=load_card("sources_card").encode(),
         path_in_repo="README.md",
         repo_id=SOURCES_DATASET_NAME,
         repo_type="dataset",
-        token=hf_token
+        token=hf_token,
     )
-    print(f"   ✅ Sources dataset uploaded successfully!")
+    print("   ✅ Sources dataset uploaded successfully!")
     print(f"      View at: https://huggingface.co/datasets/{SOURCES_DATASET_NAME}")
 
     # Upload golden testset dataset
     print(f"\n📤 Uploading golden testset to {GOLDEN_TESTSET_NAME}...")
     golden_testset_dataset.push_to_hub(
-        GOLDEN_TESTSET_NAME,
-        private=False,
-        token=hf_token
+        GOLDEN_TESTSET_NAME, private=False, token=hf_token
     )
 
     # Create and upload golden testset dataset card
-    print(f"   • Creating dataset card...")
+    print("   • Creating dataset card...")
     api.upload_file(
         path_or_fileobj=load_card("golden_testset_card").encode(),
         path_in_repo="README.md",
         repo_id=GOLDEN_TESTSET_NAME,
         repo_type="dataset",
-        token=hf_token
+        token=hf_token,
     )
-    print(f"   ✅ Golden testset uploaded successfully!")
+    print("   ✅ Golden testset uploaded successfully!")
     print(f"      View at: https://huggingface.co/datasets/{GOLDEN_TESTSET_NAME}")
 
     # Update manifest
-    print(f"\n📝 Updating manifest...")
+    print("\n📝 Updating manifest...")
     update_manifest(SOURCES_DATASET_NAME, GOLDEN_TESTSET_NAME)
 
     print("\n🎉 All datasets uploaded successfully!")
-    print(f"\n📊 Dataset URLs:")
+    print("\n📊 Dataset URLs:")
     print(f"   • Sources: https://huggingface.co/datasets/{SOURCES_DATASET_NAME}")
     print(f"   • Golden Testset: https://huggingface.co/datasets/{GOLDEN_TESTSET_NAME}")
 

@@ -33,7 +33,7 @@ DATA_DIR = BASE_DIR / "data" / "processed"
 CARDS_DIR = BASE_DIR / "data" / "cards"
 
 # Retriever names (matches filenames)
-RETRIEVERS = ["baseline", "naive", "bm25", "ensemble", "cohere_rerank"]
+RETRIEVERS = ["naive", "bm25", "ensemble", "cohere_rerank"]
 
 
 def load_card(name: str) -> str:
@@ -41,7 +41,9 @@ def load_card(name: str) -> str:
     return (CARDS_DIR / f"{name}.md").read_text()
 
 
-def load_parquet_with_retriever_column(file_path: Path, retriever_name: str) -> pd.DataFrame:
+def load_parquet_with_retriever_column(
+    file_path: Path, retriever_name: str
+) -> pd.DataFrame:
     """Load Parquet and add retriever column."""
     df = pd.read_parquet(file_path)
     df.insert(0, "retriever", retriever_name)
@@ -65,10 +67,14 @@ def load_and_consolidate_datasets(pattern: str) -> pd.DataFrame:
         print(f"      Loaded {len(df)} rows from {retriever}")
 
     if not dfs:
-        raise ValueError(f"No Parquet files found matching pattern: *_{pattern}.parquet")
+        raise ValueError(
+            f"No Parquet files found matching pattern: *_{pattern}.parquet"
+        )
 
     consolidated = pd.concat(dfs, ignore_index=True)
-    print(f"   ✅ Consolidated {len(consolidated)} total rows from {len(dfs)} retrievers")
+    print(
+        f"   ✅ Consolidated {len(consolidated)} total rows from {len(dfs)} retrievers"
+    )
     return consolidated
 
 
@@ -98,11 +104,7 @@ def main():
     print(f"   • Features: {list(eval_dataset.features.keys())}")
 
     print(f"\n📤 Uploading evaluation datasets to {EVALUATION_DATASETS_NAME}...")
-    eval_dataset.push_to_hub(
-        EVALUATION_DATASETS_NAME,
-        private=False,
-        token=hf_token
-    )
+    eval_dataset.push_to_hub(EVALUATION_DATASETS_NAME, private=False, token=hf_token)
 
     # Create and upload dataset card
     print("   • Creating dataset card...")
@@ -111,7 +113,7 @@ def main():
         path_in_repo="README.md",
         repo_id=EVALUATION_DATASETS_NAME,
         repo_type="dataset",
-        token=hf_token
+        token=hf_token,
     )
     print("   ✅ Evaluation datasets uploaded successfully!")
     print(f"      View at: https://huggingface.co/datasets/{EVALUATION_DATASETS_NAME}")
@@ -128,11 +130,7 @@ def main():
     print(f"   • Features: {list(results_dataset.features.keys())}")
 
     print(f"\n📤 Uploading detailed results to {DETAILED_RESULTS_NAME}...")
-    results_dataset.push_to_hub(
-        DETAILED_RESULTS_NAME,
-        private=False,
-        token=hf_token
-    )
+    results_dataset.push_to_hub(DETAILED_RESULTS_NAME, private=False, token=hf_token)
 
     # Create and upload dataset card
     print("   • Creating dataset card...")
@@ -141,7 +139,7 @@ def main():
         path_in_repo="README.md",
         repo_id=DETAILED_RESULTS_NAME,
         repo_type="dataset",
-        token=hf_token
+        token=hf_token,
     )
     print("   ✅ Detailed results uploaded successfully!")
     print(f"      View at: https://huggingface.co/datasets/{DETAILED_RESULTS_NAME}")
@@ -151,12 +149,20 @@ def main():
     # ========================================
     print("\n🎉 All datasets uploaded successfully!")
     print("\n📊 Dataset URLs:")
-    print(f"   • Evaluation Datasets: https://huggingface.co/datasets/{EVALUATION_DATASETS_NAME}")
-    print(f"   • Detailed Results: https://huggingface.co/datasets/{DETAILED_RESULTS_NAME}")
+    print(
+        f"   • Evaluation Datasets: https://huggingface.co/datasets/{EVALUATION_DATASETS_NAME}"
+    )
+    print(
+        f"   • Detailed Results: https://huggingface.co/datasets/{DETAILED_RESULTS_NAME}"
+    )
 
     print("\n📈 Dataset Statistics:")
-    print(f"   • Evaluation Datasets: {len(eval_dataset)} examples across {len(eval_df['retriever'].unique())} retrievers")
-    print(f"   • Detailed Results: {len(results_dataset)} examples with RAGAS metric scores")
+    print(
+        f"   • Evaluation Datasets: {len(eval_dataset)} examples across {len(eval_df['retriever'].unique())} retrievers"
+    )
+    print(
+        f"   • Detailed Results: {len(results_dataset)} examples with RAGAS metric scores"
+    )
 
     print("\n✨ Next Steps:")
     print("   1. Verify datasets on HuggingFace Hub")
