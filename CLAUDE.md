@@ -58,7 +58,7 @@ biosciences-research/
 
 **4 RAGAS metrics:** faithfulness, answer_relevancy, context_precision, context_recall
 
-**Architecture:** Factory pattern — retrievers and LangGraph workflows instantiated at runtime, not import time. Pipeline: `START → retrieve → generate → END`. See `src/README.md` for module details and `scripts/README.md` for script details.
+**Architecture:** Factory pattern — retrievers and LangGraph workflows instantiated at runtime, not import time. Pipeline: `START → retrieve → generate → END`. Inference and evaluation are architecturally decoupled: `*_evaluation_inputs.parquet` is written immediately after RAG inference, before RAGAS scoring — if RAGAS fails mid-run, inference results are preserved. See `src/README.md` for module details.
 
 ## Competency Questions & Research
 
@@ -110,6 +110,8 @@ biosciences-research/
 | `OPENAI_MODEL_NAME` | Optional | Override default model (gpt-4.1-mini) |
 | `EMBEDDING_MODEL_NAME` | Optional | Override default embeddings (text-embedding-3-small) |
 | `COHERE_RERANK_MODEL` | Optional | Override default reranker (rerank-v3.5) |
+| `HF_SOURCES_REV` | Optional | Pin HuggingFace sources dataset revision (e.g., `main@abc123`) for reproducible eval scores |
+| `HF_GOLDEN_REV` | Optional | Pin HuggingFace golden testset revision for reproducible eval scores |
 
 ## Key Technologies
 
@@ -130,6 +132,7 @@ biosciences-research/
 - `tests/` contains only `__init__.py`; validation is done via `make validate`, not pytest
 - Cohere rerank retriever fails silently without `COHERE_API_KEY` set
 - Full evaluation run costs ~$5-6 in API calls (OpenAI + Cohere)
+- Script naming encodes idempotency: `run_*` = repeatable, `ingest_*` and `publish_*` = one-time operations
 
 ## Platform Context
 
