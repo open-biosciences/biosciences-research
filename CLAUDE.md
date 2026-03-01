@@ -4,7 +4,7 @@
 
 This repo serves two complementary purposes:
 
-1. **GDELT RAG Evaluation Pipeline** — Working code that benchmarks 4 retrieval strategies (naive, bm25, ensemble, cohere_rerank) against RAGAS metrics using 10 biosciences PDFs as source material
+1. **Biosciences Research RAG Evaluation Pipeline** — Working code that benchmarks 4 retrieval strategies (naive, bm25, ensemble, cohere_rerank) against RAGAS metrics using 10 biosciences PDFs as source material
 2. **Competency Questions & Prior Art Research** — 15 structured CQs, Paul Zamora's 12 oncology questions, and API pattern documentation that define what the Open Biosciences platform should answer
 
 Owned by the **Research Workflows Engineer** (Agent #6).
@@ -15,6 +15,7 @@ Owned by the **Research Workflows Engineer** (Agent #6).
 uv sync                          # Install dependencies
 cp .env.example .env             # Configure (edit with real API keys)
 make validate                    # 23-point environment check
+make dev                         # Start LangGraph dev server (4 RAG strategies)
 make eval                        # RAGAS evaluation (~20-30 min, ~$5-6)
 make deliverables                # Generate CSV from Parquet
 make help                        # All available commands
@@ -42,7 +43,8 @@ biosciences-research/
 ├── templates/                   # HuggingFace dataset card template
 ├── tests/                       # Test package (placeholder — validation via make validate)
 ├── Makefile                     # All commands
-├── langgraph.json               # LangGraph config (entry: app.graph_app:get_app)
+├── app/                         # LangGraph Server entry points (4 RAG strategies)
+├── langgraph.json               # LangGraph config (4 graphs: naive, bm25, ensemble, cohere_rerank)
 └── pyproject.toml               # Package: biosciences-research, Python >=3.11
 ```
 
@@ -75,6 +77,7 @@ biosciences-research/
 - `make ingest` — Extract PDFs and generate golden testset (~5-10 min, ~$2-3)
 
 **Development:**
+- `make dev` — Start LangGraph dev server with all 4 RAG strategies (Studio UI at http://127.0.0.1:2024)
 - `make validate` — 23-point environment and module validation (100% pass required)
 - `make eval` — Run RAGAS evaluation, reuse Qdrant collection
 - `make eval recreate=true` — Force fresh Qdrant collection (adds ~5 min)
@@ -128,7 +131,7 @@ biosciences-research/
 
 - `PYTHONPATH=.` is required for direct script execution — Makefile handles this automatically
 - `make eval` reuses the existing Qdrant collection by default; use `recreate=true` for fresh embeddings
-- `langgraph.json` references `app.graph_app:get_app` — this is a placeholder entry point that doesn't exist yet
+- `langgraph.json` exposes 4 graphs (naive, bm25, ensemble, cohere_rerank) via `app/graph_app.py`; cold start takes ~10-30s (HF download + Qdrant init)
 - `tests/` contains only `__init__.py`; validation is done via `make validate`, not pytest
 - Cohere rerank retriever fails silently without `COHERE_API_KEY` set
 - Full evaluation run costs ~$5-6 in API calls (OpenAI + Cohere)

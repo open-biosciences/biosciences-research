@@ -1,7 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "biosciences-research"
 version = "0.2.0"
-description = "GDELT RAG Evaluation Pipeline and Biosciences Research"
+description = "Biosciences Research RAG Evaluation Pipeline"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -37,5 +41,8 @@ dependencies = [
     "python-dotenv>=1.1.1",
 
     # LangGraph CLI
-    "langgraph-cli[inmem]>=0.4.4",
+    "langgraph-cli[inmem]>=0.4.12",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src", "app"]

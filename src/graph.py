@@ -1,7 +1,7 @@
 # graph.py
 
 """
-LangChain agent factory for GDELT RAG system.
+LangChain agent factory for Biosciences Research RAG system.
 
 This module provides factory functions to create LangChain agents with
 retrieval middleware. Uses create_agent + dynamic_prompt from LangChain 1.0
@@ -63,7 +63,7 @@ def build_graph(retriever, llm=None, prompt_template: str = None):
         >>> retrievers = create_retrievers(documents, vector_store)
         >>> agent = build_graph(retrievers['naive'])
         >>>
-        >>> result = invoke_for_benchmark(agent, "What is GDELT?")
+        >>> result = invoke_for_benchmark(agent, "What is BRCA1?")
         >>> print(result['response'])
     """
     if llm is None:
@@ -106,7 +106,7 @@ def build_all_graphs(retrievers: Dict[str, object], llm=None) -> Dict[str, objec
 
     Example:
         >>> graphs = build_all_graphs(retrievers)
-        >>> result = invoke_for_benchmark(graphs['naive'], "What is GDELT?")
+        >>> result = invoke_for_benchmark(graphs['naive'], "What is BRCA1?")
     """
     return {name: build_graph(ret, llm) for name, ret in retrievers.items()}
 
