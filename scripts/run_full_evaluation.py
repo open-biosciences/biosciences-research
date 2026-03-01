@@ -136,10 +136,11 @@ def validate_and_normalize_ragas_schema(
     return df
 
 
-# Configuration
-QDRANT_HOST = "localhost"
-QDRANT_PORT = 6333
-COLLECTION_NAME = "biosciences-data-sources"
+# Configuration — read from environment, matching src/config.py behavior
+QDRANT_URL = os.getenv("QDRANT_URL")
+QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
+QDRANT_PORT = int(os.getenv("QDRANT_PORT", "6333"))
+COLLECTION_NAME = os.getenv("QDRANT_COLLECTION", "biosciences-data-sources")
 
 # Disable XetHub progress bars
 os.environ["HF_HUB_DISABLE_XET"] = "1"
@@ -216,8 +217,13 @@ print("\n3. Creating RAG system with Qdrant...")
 
 # Initialize models (temperature=0 for determinism)
 
-print(f"   Connecting to Qdrant at {QDRANT_HOST}:{QDRANT_PORT}...")
-qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+qdrant_label = QDRANT_URL or f"{QDRANT_HOST}:{QDRANT_PORT}"
+print(f"   Connecting to Qdrant at {qdrant_label}...")
+if QDRANT_URL:
+    qdrant_api_key = os.getenv("QDRANT_API_KEY")
+    qdrant_client = QdrantClient(url=QDRANT_URL, api_key=qdrant_api_key)
+else:
+    qdrant_client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 
 # Check if collection exists, recreate if needed
 collections = qdrant_client.get_collections().collections
@@ -502,7 +508,7 @@ except Exception as e:
 print("\n" + "=" * 80)
 print("COMPARATIVE RAG EVALUATION RESULTS (TASKS 5 & 7)")
 print("=" * 80)
-print(f"\nVector DB: Qdrant ({QDRANT_HOST}:{QDRANT_PORT})")
+print(f"\nVector DB: Qdrant ({qdrant_label})")
 print(f"Test Set: {len(golden_df)} questions")
 print(f"Retrievers Evaluated: {len(retrievers_config)}\n")
 

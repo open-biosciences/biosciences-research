@@ -17,8 +17,10 @@
         "qdrant-client>=1.17.0",
         "rank-bm25>=0.2.2",
         "pymupdf>=1.26.3",
-        "huggingface-hub>=0.26.0",
-        "datasets>=3.2.0"
+        "rapidfuzz>=3.14.1",
+        "openai>=2.4.0",
+        "huggingface-hub>=1.5.0",
+        "datasets>=4.6.1"
     ],
     "env": {
         "QDRANT_URL": "http://localhost:6333",

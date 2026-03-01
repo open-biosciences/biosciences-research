@@ -6,7 +6,7 @@ THIS IS THE SAME AS run_full_evaluation.py BUT USES src/ MODULES INSTEAD OF INLI
 
 What it does:
 - Runs 12 test questions through 4 retrievers (naive, bm25, ensemble, cohere_rerank)
-- Evaluates with RAGAS (Faithfulness, ResponseRelevancy, ContextPrecision, LLMContextRecall)
+- Evaluates with RAGAS (Faithfulness, AnswerRelevancy, ContextPrecision, ContextRecall)
 - Saves results to deliverables/evaluation_evidence/
 
 Time: 20-30 minutes

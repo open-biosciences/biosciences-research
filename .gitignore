@@ -213,3 +213,6 @@ deliverables/
 
 # Git worktrees
 .worktrees/
+
+# pckl files
+*.pckl
