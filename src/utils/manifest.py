@@ -13,7 +13,7 @@ This manifest enables exact reproduction of evaluation results.
 
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -136,7 +136,7 @@ def generate_manifest(
             "Fine-tuned embeddings out of scope per instructor guidance",
             "Evaluation follows RAGAS 0.4.x API patterns (metrics from ragas.metrics.collections)",
         ],
-        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "generated_by": "scripts/generate_run_manifest.py",
     }
 

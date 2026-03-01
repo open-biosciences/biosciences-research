@@ -16,7 +16,7 @@ import json
 import os
 import platform
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
@@ -41,6 +41,14 @@ from langchain_core.documents import Document
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from ragas.testset import TestsetGenerator
+from ragas.testset.transforms import (
+    HeadlinesExtractor,
+    HeadlineSplitter,
+    KeyphrasesExtractor,
+    OverlapScoreBuilder,
+)
+from ragas.testset.transforms.extractors import EmbeddingExtractor, SummaryExtractor
+from ragas.testset.transforms.relationship_builders import CosineSimilarityBuilder
 
 # Config (paths, models, knobs)
 
@@ -205,13 +213,49 @@ TransientErr = (RateLimitError, APITimeoutError, APIStatusError, APIConnectionEr
     retry=retry_if_exception_type(TransientErr),
 )
 def build_testset(docs, size: int):
-    # --- RAGAS 0.4.x approach: use from_langchain() class method ---
-    # TestsetGenerator.from_langchain() is the official LangChain integration path
-    # and handles wrapping internally.
+    """Generate a RAGAS golden testset from LangChain documents.
+
+    Uses a custom transform pipeline based on the official RAGAS 0.4 documentation
+    (https://docs.ragas.io/en/latest/howtos/customizations/testgenerator/).
+    The default_transforms() has a bug where HeadlineSplitter runs on all nodes
+    but HeadlinesExtractor only processes docs with >500 tokens, causing ValueError
+    on short documents. The documented custom pipeline avoids this by running
+    HeadlinesExtractor on ALL documents without filter_nodes.
+    """
     lc_llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0, timeout=60, max_retries=6)
     lc_emb = OpenAIEmbeddings(model="text-embedding-3-small", timeout=60, max_retries=6)
     gen = TestsetGenerator.from_langchain(lc_llm, lc_emb)
-    return gen.generate_with_langchain_docs(docs, testset_size=size)
+
+    # Custom transform pipeline based on RAGAS docs with additions required
+    # by generate_personas_from_kg (needs 'summary' + 'summary_embedding').
+    # No filter_nodes — HeadlinesExtractor processes ALL docs so
+    # HeadlineSplitter never encounters a node without 'headlines'.
+    transforms = [
+        HeadlinesExtractor(llm=gen.llm),
+        HeadlineSplitter(min_tokens=300, max_tokens=1000),
+        SummaryExtractor(llm=gen.llm),
+        KeyphrasesExtractor(llm=gen.llm, property_name="keyphrases", max_num=10),
+        EmbeddingExtractor(
+            embedding_model=gen.embedding_model,
+            property_name="summary_embedding",
+            embed_property_name="summary",
+        ),
+        CosineSimilarityBuilder(
+            property_name="summary_embedding",
+            new_property_name="summary_similarity",
+            threshold=0.7,
+        ),
+        OverlapScoreBuilder(
+            property_name="keyphrases",
+            new_property_name="overlap_score",
+            threshold=0.01,
+            distance_threshold=0.9,
+        ),
+    ]
+
+    return gen.generate_with_langchain_docs(
+        docs, testset_size=size, transforms=transforms
+    )
 
 
 golden_testset = build_testset(docs, TESTSET_SIZE)
@@ -258,7 +302,7 @@ def _ver(pkg):
 
 manifest = {
     "id": f"ragas_pipeline_{uuid.uuid4()}",
-    "generated_at": datetime.utcnow().isoformat() + "Z",
+    "generated_at": datetime.now(timezone.utc).isoformat(),
     "run": {"random_seed": RANDOM_SEED},
     "env": {
         "python": platform.python_version(),
