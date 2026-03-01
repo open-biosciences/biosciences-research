@@ -87,43 +87,43 @@
     "Fine-tuned embeddings out of scope per instructor guidance",
     "Evaluation follows RAGAS 0.2.10 API patterns from session08"
   ],
-  "generated_at": "2026-03-01T06:21:48.383365Z",
+  "generated_at": "2026-03-01T07:17:51.439160Z",
   "generated_by": "scripts/generate_run_manifest.py",
   "results_summary": {
     "naive": {
-      "faithfulness": 0.9257811399329956,
-      "answer_relevancy": 0.8888729193928951,
-      "context_precision": 0.6831018518251987,
-      "context_recall": 0.777281746031746,
-      "average": 0.8187594142957089
+      "faithfulness": 0.9392202751403714,
+      "answer_relevancy": 0.9603827093149282,
+      "context_precision": 0.8775462962728607,
+      "context_recall": 0.9666666666666667,
+      "average": 0.9359539868487068
     },
     "bm25": {
-      "faithfulness": 0.8600973824077539,
-      "answer_relevancy": 0.9644566875946076,
-      "context_precision": 0.8354166666331423,
-      "context_recall": 0.9325396825396824,
-      "average": 0.8981276047937965
+      "faithfulness": 0.914984851727557,
+      "answer_relevancy": 0.9645305178704646,
+      "context_precision": 0.8756944444185127,
+      "context_recall": 0.9103174603174603,
+      "average": 0.9163818185834987
     },
     "ensemble": {
-      "faithfulness": 0.949698395919326,
-      "answer_relevancy": 0.9679530383887543,
-      "context_precision": 0.7657728646798764,
-      "context_recall": 0.9603174603174603,
-      "average": 0.9109354398263543
+      "faithfulness": 0.9592631941838291,
+      "answer_relevancy": 0.9613054326178482,
+      "context_precision": 0.8978680476640714,
+      "context_recall": 0.9666666666666667,
+      "average": 0.9462758352831039
     },
     "cohere_rerank": {
-      "faithfulness": 0.9044394866331443,
-      "answer_relevancy": 0.9656516317453839,
-      "context_precision": 0.9166666666277776,
-      "context_recall": 0.8392857142857143,
-      "average": 0.9065108748230051
+      "faithfulness": 0.9564670456391845,
+      "answer_relevancy": 0.9659360653099435,
+      "context_precision": 0.9861111110743054,
+      "context_recall": 0.9305555555555555,
+      "average": 0.9597674443947471
     }
   },
   "data_provenance": {
-    "ingest_manifest_id": "ragas_pipeline_0624a7bd-6751-4034-92f7-80c9fc84522f",
-    "ingest_timestamp": "2026-03-01T06:06:28.848963Z",
+    "ingest_manifest_id": "ragas_pipeline_f1eb144c-3c06-4354-bf0c-e0f752faedfe",
+    "ingest_timestamp": "2026-03-01T06:59:32.140375Z",
     "sources_sha256": "78d5a84e23a949f88f259c8ef8a82179fa85b85218f1af2de467a4b3a466e51a",
-    "golden_testset_sha256": "f7307a55c4ca61f7cd709ea9cf01844d6b37335305aefd23cb696ed456e6c003",
+    "golden_testset_sha256": "cbd520971dc809cef39b51189b4908c1d719ee8a90eb0d71f708751368e69277",
     "source_pdfs_count": "all",
     "ragas_testset_size": 10
   }
