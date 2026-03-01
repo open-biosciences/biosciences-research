@@ -36,14 +36,16 @@ from datetime import datetime
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from openai import OpenAI
 from ragas import EvaluationDataset, RunConfig, evaluate
-from ragas.metrics import (
+from ragas.metrics.collections import (
     Faithfulness,
-    ResponseRelevancy,
+    AnswerRelevancy,
     ContextPrecision,
-    LLMContextRecall,
+    ContextRecall,
 )
-from ragas.llms import LangchainLLMWrapper
+from ragas.llms import llm_factory
+from ragas.embeddings import OpenAIEmbeddings as RagasOpenAIEmbeddings
 
 from src.utils import (
     load_documents_from_huggingface,
@@ -51,7 +53,7 @@ from src.utils import (
 )
 from src.config import create_vector_store, get_llm
 from src.retrievers import create_retrievers
-from src.graph import build_all_graphs
+from src.graph import build_all_graphs, invoke_for_benchmark
 
 
 # ==============================================================================
@@ -196,7 +198,7 @@ for name, graph in graphs.items():
     # Run inference
     for idx, row in df.iterrows():
         q = row["user_input"]
-        result = graph.invoke({"question": q})
+        result = invoke_for_benchmark(graph, q)
         df.at[idx, "response"] = result["response"]
         df.at[idx, "retrieved_contexts"] = [d.page_content for d in result["context"]]
 
@@ -221,7 +223,11 @@ print("STEP 4: RAGAS EVALUATION")
 print("=" * 80)
 print("\nMetrics: Faithfulness, Answer Relevancy, Context Precision, Context Recall")
 
-evaluator_llm = LangchainLLMWrapper(get_llm())
+openai_client = OpenAI()
+evaluator_llm = llm_factory("gpt-4.1-mini", client=openai_client)
+evaluator_emb = RagasOpenAIEmbeddings(
+    client=openai_client, model="text-embedding-3-small"
+)
 run_cfg = RunConfig(timeout=360)
 
 results = {}
@@ -232,16 +238,15 @@ for name, df in datasets.items():
     # NOTE: evaluation_inputs.parquet already saved in Step 3 (after inference)
     eval_ds = EvaluationDataset.from_pandas(df)
 
-    # Run RAGAS evaluation
+    # Run RAGAS evaluation (evaluate() is deprecated in 0.4 but still functional)
     res = evaluate(
         dataset=eval_ds,
         metrics=[
-            Faithfulness(),
-            ResponseRelevancy(),
-            ContextPrecision(),
-            LLMContextRecall(),
+            Faithfulness(llm=evaluator_llm),
+            AnswerRelevancy(llm=evaluator_llm, embeddings=evaluator_emb),
+            ContextPrecision(llm=evaluator_llm, name="context_precision"),
+            ContextRecall(llm=evaluator_llm),
         ],
-        llm=evaluator_llm,
         run_config=run_cfg,
     )
     results[name] = res

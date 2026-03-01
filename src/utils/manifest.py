@@ -134,7 +134,7 @@ def generate_manifest(
         "notes": [
             "All LLM calls use temperature=0 for determinism",
             "Fine-tuned embeddings out of scope per instructor guidance",
-            "Evaluation follows RAGAS 0.2.10 API patterns from session08",
+            "Evaluation follows RAGAS 0.4.x API patterns (metrics from ragas.metrics.collections)",
         ],
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "generated_by": "scripts/generate_run_manifest.py",

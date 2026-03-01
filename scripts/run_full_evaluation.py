@@ -2,13 +2,13 @@
 """
 Task 5 & 7: Comprehensive RAG Evaluation with RAGAS
 
-Evaluates multiple retrieval systems using RAGAS metrics:
+Evaluates multiple retrieval systems using RAGAS 0.4 metrics:
 - Faithfulness: Answer groundedness in retrieved context
-- Response Relevancy: Answer relevance to the question (class: ResponseRelevancy)
-- Context Precision: Relevant contexts ranked higher
-- Context Recall: Ground truth coverage (class: LLMContextRecall)
+- Answer Relevancy: Answer relevance to the question (class: AnswerRelevancy)
+- Context Precision: Relevant contexts ranked higher (class: ContextPrecision)
+- Context Recall: Ground truth coverage (class: ContextRecall)
 
-Note: RAGAS class names are capitalized (e.g., ResponseRelevancy), but output
+Note: RAGAS class names are capitalized (e.g., AnswerRelevancy), but output
 DataFrame columns are lowercase (e.g., 'answer_relevancy', 'context_recall').
 
 Retrievers:
@@ -51,15 +51,17 @@ from langgraph.graph import START, StateGraph
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 
-# RAGAS
+# RAGAS 0.4
+from openai import OpenAI as OpenAIClient
 from ragas import EvaluationDataset, RunConfig, evaluate
-from ragas.metrics import (
+from ragas.metrics.collections import (
     Faithfulness,
-    ResponseRelevancy,
+    AnswerRelevancy,
     ContextPrecision,
-    LLMContextRecall,
+    ContextRecall,
 )
-from ragas.llms import LangchainLLMWrapper
+from ragas.llms import llm_factory
+from ragas.embeddings import OpenAIEmbeddings as RagasOpenAIEmbeddings
 
 # Typing
 from typing_extensions import TypedDict
@@ -70,7 +72,7 @@ def validate_and_normalize_ragas_schema(
     df: pd.DataFrame, retriever_name: str = "unknown"
 ) -> pd.DataFrame:
     """
-    Ensure DataFrame matches RAGAS 0.2.10 schema requirements.
+    Ensure DataFrame matches RAGAS 0.4.x schema requirements.
 
     Handles different column naming conventions and validates required fields.
     Prevents silent breakage when running with different RAGAS versions.
@@ -91,7 +93,7 @@ def validate_and_normalize_ragas_schema(
     if retriever_name == "naive" or retriever_name == "unknown":
         print(f"   RAGAS version: {ragas.__version__}")
 
-    # Expected RAGAS columns (0.2.10 spec)
+    # Expected RAGAS columns (0.4.x spec)
     expected_cols = {"user_input", "response", "retrieved_contexts", "reference"}
 
     # Rename mapping for common variations
@@ -149,7 +151,11 @@ if not os.getenv("OPENAI_API_KEY"):
 
 llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-evaluator_llm = LangchainLLMWrapper(ChatOpenAI(model="gpt-4.1-mini", temperature=0))
+_openai_client = OpenAIClient()
+evaluator_llm = llm_factory("gpt-4.1-mini", client=_openai_client)
+evaluator_emb = RagasOpenAIEmbeddings(
+    client=_openai_client, model="text-embedding-3-small"
+)
 
 # Load ingestion manifest if available (for data lineage)
 ingest_manifest_path = Path(__file__).parent.parent / "data/interim/manifest.json"
@@ -411,7 +417,7 @@ for retriever_name, dataset in datasets.items():
 
 # 9. Run RAGAS Evaluation for All Retrievers
 print("\n9. Running RAGAS evaluation for all retrievers...")
-print("   Metrics: Faithfulness, ResponseRelevancy, ContextPrecision, LLMContextRecall")
+print("   Metrics: Faithfulness, AnswerRelevancy, ContextPrecision, ContextRecall")
 print(
     "   (Output columns: faithfulness, answer_relevancy, context_precision, context_recall)"
 )
@@ -425,12 +431,11 @@ for retriever_name, eval_dataset in evaluation_datasets.items():
     result = evaluate(
         dataset=eval_dataset,
         metrics=[
-            Faithfulness(),
-            ResponseRelevancy(),
-            ContextPrecision(),
-            LLMContextRecall(),
+            Faithfulness(llm=evaluator_llm),
+            AnswerRelevancy(llm=evaluator_llm, embeddings=evaluator_emb),
+            ContextPrecision(llm=evaluator_llm, name="context_precision"),
+            ContextRecall(llm=evaluator_llm),
         ],
-        llm=evaluator_llm,
         run_config=custom_run_config,
     )
 
@@ -454,7 +459,7 @@ try:
     for retriever_name, result in evaluation_results.items():
         result_df = result.to_pandas()
 
-        # RAGAS 0.2.10 returns lowercase column names from metrics
+        # RAGAS 0.4.x returns lowercase column names from metrics
         row = {
             "Retriever": retriever_name.replace("_", " ").title(),
             "Faithfulness": result_df["faithfulness"].mean(),

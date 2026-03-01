@@ -21,12 +21,12 @@ dependencies = [
     # Qdrant
     "qdrant-client>=1.17.0",
 
-    # Evaluation (pinned — PR4 upgrades to 0.4)
-    "ragas==0.2.10",
+    # Evaluation (upgraded from 0.2.10 in PR4)
+    "ragas>=0.4.3",
 
     # Data & tools
-    "huggingface-hub>=0.26.0",
-    "datasets>=3.2.0",
+    "huggingface-hub>=1.5.0",
+    "datasets>=4.6.1",
     "rank-bm25>=0.2.2",
     "pymupdf>=1.26.3",
     "jupyter>=1.1.1",
