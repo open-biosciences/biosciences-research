@@ -103,21 +103,22 @@ def check_environment() -> Dict[str, bool]:
         "Required for rerank retriever (optional for other retrievers)",
     )
 
-    # Check Qdrant connectivity
-    try:
-        from qdrant_client import QdrantClient
+    # Check Qdrant connectivity (uses QDRANT_URL or QDRANT_HOST/PORT from config)
+    from src.config import get_qdrant, QDRANT_URL, QDRANT_HOST, QDRANT_PORT
 
-        client = QdrantClient(host="localhost", port=6333, timeout=5)
+    qdrant_label = QDRANT_URL or f"{QDRANT_HOST}:{QDRANT_PORT}"
+    try:
+        client = get_qdrant()
         collections = client.get_collections()
         results["qdrant"] = True
         print_check(
-            "Qdrant at localhost:6333",
+            f"Qdrant at {qdrant_label}",
             True,
             f"Found {len(collections.collections)} collections",
         )
     except Exception as e:
         results["qdrant"] = False
-        print_check("Qdrant at localhost:6333", False, str(e))
+        print_check(f"Qdrant at {qdrant_label}", False, str(e))
 
     # Check critical Python imports
     critical_imports = [
@@ -406,7 +407,7 @@ def generate_diagnostic_report(
                 "title": "Qdrant Not Accessible",
                 "severity": "HIGH",
                 "impact": "Cannot store or retrieve document embeddings",
-                "fix": "Start Qdrant: docker-compose up -d qdrant",
+                "fix": "Check QDRANT_URL or QDRANT_HOST/QDRANT_PORT in .env",
             }
         )
 
