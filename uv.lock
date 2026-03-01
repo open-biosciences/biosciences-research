@@ -314,8 +314,8 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "cohere", specifier = ">=5.20.5" },
-    { name = "datasets", specifier = ">=3.2.0" },
-    { name = "huggingface-hub", specifier = ">=0.26.0" },
+    { name = "datasets", specifier = ">=4.6.1" },
+    { name = "huggingface-hub", specifier = ">=1.5.0" },
     { name = "jupyter", specifier = ">=1.1.1" },
     { name = "langchain", specifier = ">=1.2.10" },
     { name = "langchain-classic", specifier = ">=1.0.1" },
