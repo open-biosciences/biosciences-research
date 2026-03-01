@@ -1,7 +1,7 @@
 # retrievers.py
 
 """
-Retriever factory functions for GDELT RAG system.
+Retriever factory functions for Biosciences Research RAG system.
 
 This module provides factory functions to create retrievers. Retrievers cannot
 be instantiated at module level because they require documents and vector stores
@@ -51,8 +51,8 @@ def create_retrievers(
         >>> retrievers = create_retrievers(documents, vector_store)
         >>>
         >>> # Use individual retrievers
-        >>> naive_docs = retrievers['naive'].invoke("What is GDELT?")
-        >>> bm25_docs = retrievers['bm25'].invoke("What is GDELT?")
+        >>> naive_docs = retrievers['naive'].invoke("What is BRCA1?")
+        >>> bm25_docs = retrievers['bm25'].invoke("What is BRCA1?")
 
     Notes:
         - All retrievers return up to k documents

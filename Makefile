@@ -1,15 +1,16 @@
-# Makefile for GDELT RAG Evaluation System
+# Makefile for Biosciences Research RAG
 
-.PHONY: help validate eval deliverables ingest publish-interim publish-processed clean clean-deliverables clean-processed clean-all env docker-up docker-down test notebook
+.PHONY: help validate eval deliverables ingest publish-interim publish-processed clean clean-deliverables clean-processed clean-all env docker-up docker-down test notebook dev
 
 # Default target
 help:
-	@echo "GDELT RAG Evaluation System - Available Commands"
+	@echo "Biosciences Research RAG - Available Commands"
 	@echo ""
 	@echo "Data Preparation (one-time setup):"
 	@echo "  make ingest      - Extract PDFs and generate golden testset (~5-10 min, \$$2-3)"
 	@echo ""
 	@echo "Development:"
+	@echo "  make dev         - Start LangGraph dev server (4 RAG strategies)"
 	@echo "  make validate    - Validate src/ module implementation (100% pass required)"
 	@echo "  make eval        - Run RAGAS evaluation, reuse collection"
 	@echo "  make eval recreate=true - Force fresh Qdrant collection (adds ~5 min)"
@@ -32,6 +33,15 @@ help:
 	@echo "Jupyter:"
 	@echo "  make notebook    - Start Jupyter notebook server"
 	@echo ""
+
+# Start LangGraph dev server with all 4 RAG strategies
+dev:
+	@echo "Starting LangGraph dev server..."
+	@echo "Prerequisites: Qdrant running, OPENAI_API_KEY, COHERE_API_KEY, LANGSMITH_API_KEY"
+	@echo "Graphs: naive, bm25, ensemble, cohere_rerank"
+	@echo "Studio UI: http://127.0.0.1:2024"
+	@echo ""
+	uv run langgraph dev --no-browser --allow-blocking
 
 # Validate src/ module implementation
 validate:

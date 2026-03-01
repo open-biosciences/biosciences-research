@@ -1,34 +1,13 @@
 {
-    "name": "gdelt-langgraph",
+    "name": "biosciences-research",
     "python_version": "3.11",
     "image_distro": "wolfi",
-    "dependencies": [
-        ".",
-        "langgraph>=1.0.10",
-        "langgraph-cli>=0.4.4",
-        "langchain>=1.2.10",
-        "langchain-core>=1.2.16",
-        "langchain-classic>=1.0.1",
-        "langchain-community>=0.4.1",
-        "langchain-openai>=1.1.10",
-        "langchain-cohere>=0.5.0",
-        "cohere>=5.20.5",
-        "langchain-qdrant>=1.1.0",
-        "qdrant-client>=1.17.0",
-        "rank-bm25>=0.2.2",
-        "pymupdf>=1.26.3",
-        "rapidfuzz>=3.14.1",
-        "openai>=2.4.0",
-        "huggingface-hub>=1.5.0",
-        "datasets>=4.6.1"
-    ],
-    "env": {
-        "QDRANT_URL": "http://localhost:6333",
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "COHERE_API_KEY": "${COHERE_API_KEY}",
-        "LANGSMITH_API_KEY": "${LANGSMITH_API_KEY}"
-    },
+    "dependencies": ["."],
+    "env": ".env",
     "graphs": {
-        "gdelt": "app.graph_app:get_app"
+        "naive": "./app/graph_app.py:get_naive",
+        "bm25": "./app/graph_app.py:get_bm25",
+        "ensemble": "./app/graph_app.py:get_ensemble",
+        "cohere_rerank": "./app/graph_app.py:get_cohere_rerank"
     }
 }
