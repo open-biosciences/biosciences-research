@@ -210,3 +210,6 @@ __marimo__/
 data/interim/
 data/processed/
 deliverables/
+
+# Git worktrees
+.worktrees/
