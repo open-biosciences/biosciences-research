@@ -1,26 +1,37 @@
 [project]
 name = "biosciences-research"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "GDELT RAG Evaluation Pipeline and Biosciences Research"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "jupyter>=1.1.1",
-    "langchain-experimental>=0.3.4",
-    "langchain>=0.3.19",
-    "langchain-cohere==0.4.4",
-    "cohere==5.12.0",
-    "langchain-openai>=0.3.7",
-    "langgraph==0.6.7",
+    # Core LangChain 1.0 ecosystem
+    "langchain>=1.2.10",
+    "langchain-core>=1.2.16",
+    "langchain-classic>=1.0.1",
+    "langchain-community>=0.4.1",
+    "langchain-openai>=1.1.10",
+    "langchain-cohere>=0.5.0",
+    "langchain-qdrant>=1.1.0",
+    "langgraph>=1.0.10",
+
+    # Cohere SDK
+    "cohere>=5.20.5",
+
+    # Qdrant
     "qdrant-client>=1.17.0",
-    "rank-bm25>=0.2.2",
-    "langchain-qdrant>=0.2.0",
+
+    # Evaluation (pinned — PR4 upgrades to 0.4)
     "ragas==0.2.10",
-    "pymupdf>=1.26.3",
-    "rapidfuzz>=3.14.1",
+
+    # Data & tools
     "huggingface-hub>=0.26.0",
     "datasets>=3.2.0",
-    "langgraph-cli[inmem]>=0.4.4",
-    "openai>=2.4.0",
+    "rank-bm25>=0.2.2",
+    "pymupdf>=1.26.3",
+    "jupyter>=1.1.1",
     "python-dotenv>=1.1.1",
+
+    # LangGraph CLI
+    "langgraph-cli[inmem]>=0.4.4",
 ]

@@ -11,7 +11,7 @@ must be created first.
 from typing import Dict, List
 from langgraph.graph import StateGraph, START, END
 from langchain_core.documents import Document
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
 from src.state import State
 from src.prompts import BASELINE_PROMPT
@@ -89,8 +89,7 @@ def build_graph(retriever, llm=None, prompt_template: str = None):
         """
         docs_content = "\n\n".join(d.page_content for d in state.get("context", []))
         msgs = rag_prompt.format_messages(
-            question=state["question"],
-            context=docs_content
+            question=state["question"], context=docs_content
         )
         response = llm.invoke(msgs)
         return {"response": response.content}

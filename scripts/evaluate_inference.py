@@ -8,13 +8,15 @@ Saves to `data/processed/*_evaluation_inputs.parquet`
 import os
 import sys
 import copy
-import json
 import argparse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.utils import load_documents_from_huggingface, load_golden_testset_from_huggingface
+from src.utils import (
+    load_documents_from_huggingface,
+    load_golden_testset_from_huggingface,
+)
 from src.config import create_vector_store, get_llm
 from src.retrievers import create_retrievers
 from src.graph import build_all_graphs
@@ -33,9 +35,9 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 os.environ["HF_HUB_DISABLE_XET"] = "1"
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 
-print("="*80)
+print("=" * 80)
 print("INFERENCE GENERATION (Step 1 of 2)")
-print("="*80)
+print("=" * 80)
 
 print("\nLoading source documents...")
 docs = load_documents_from_huggingface(DATASET_SOURCES, "train")
@@ -53,9 +55,9 @@ retrievers = create_retrievers(docs, vs, k=K)
 print("\nBuilding LangGraph workflows...")
 graphs = build_all_graphs(retrievers, llm=get_llm())
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("RUNNING INFERENCE")
-print("="*80)
+print("=" * 80)
 
 datasets = {}
 for name, graph in graphs.items():
@@ -63,13 +65,13 @@ for name, graph in graphs.items():
     df = copy.deepcopy(golden_df)
     df["response"] = None
     df["retrieved_contexts"] = None
-    
+
     for idx, row in df.iterrows():
         q = row["user_input"]
         result = graph.invoke({"question": q})
         df.at[idx, "response"] = result["response"]
         df.at[idx, "retrieved_contexts"] = [d.page_content for d in result["context"]]
-        
+
     inference_file = OUT_DIR / f"{name}_evaluation_inputs.parquet"
     df.to_parquet(str(inference_file), compression="zstd", index=False)
     print(f"   💾 Saved inference results: {inference_file.name}")

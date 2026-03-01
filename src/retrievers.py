@@ -11,10 +11,11 @@ that must be loaded first.
 from typing import Dict, List
 from langchain_core.documents import Document
 from langchain_community.retrievers import BM25Retriever
-from langchain.retrievers import EnsembleRetriever
-from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
+from langchain_classic.retrievers import EnsembleRetriever
+from langchain_classic.retrievers import ContextualCompressionRetriever
 from langchain_cohere import CohereRerank
 from langchain_qdrant import QdrantVectorStore
+from src.config import COHERE_RERANK_MODEL
 
 
 def create_retrievers(
@@ -67,17 +68,16 @@ def create_retrievers(
 
     # Ensemble: Hybrid search (dense + sparse)
     ensemble_retriever = EnsembleRetriever(
-        retrievers=[naive_retriever, bm25_retriever],
-        weights=[0.5, 0.5]
+        retrievers=[naive_retriever, bm25_retriever], weights=[0.5, 0.5]
     )
 
     # Cohere Rerank: Contextual compression
     # First retrieve a wider set (20 docs), then rerank to top k
     wide_retriever = vector_store.as_retriever(search_kwargs={"k": max(20, k)})
-    reranker = CohereRerank(model="rerank-v3.5")  # Explicit model for reproducibility
+    reranker = CohereRerank(model=COHERE_RERANK_MODEL)
     compression_retriever = ContextualCompressionRetriever(
         base_compressor=reranker,
-        base_retriever=wide_retriever
+        base_retriever=wide_retriever,
         # Note: search_kwargs not valid here - k controlled by base_retriever
     )
 

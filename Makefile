@@ -74,7 +74,7 @@ env:
 	@if [ -n "$$QDRANT_API_KEY" ]; then echo "  ✅ QDRANT_API_KEY: set"; else echo "  ℹ️  QDRANT_API_KEY: not set (vector store not available)"; fi
 	@if [ -n "$$OPENAI_API_KEY" ]; then echo "  ✅ OPENAI_API_KEY: set"; else echo "  ❌ OPENAI_API_KEY: not set"; fi
 	@if [ -n "$$COHERE_API_KEY" ]; then echo "  ✅ COHERE_API_KEY: set"; else echo "  ⚠️  COHERE_API_KEY: not set (cohere_rerank will fail)"; fi
-	@if [ -n "$$LANGCHAIN_API_KEY" ]; then echo "  ✅ LANGCHAIN_API_KEY: set"; else echo "  ℹ️  LANGCHAIN_API_KEY: not set (tracing disabled)"; fi
+	@if [ -n "$$LANGSMITH_API_KEY" ]; then echo "  ✅ LANGSMITH_API_KEY: set"; else echo "  ℹ️  LANGSMITH_API_KEY: not set (tracing disabled)"; fi
 	@echo ""
 	@echo "Python:"
 	@python --version 2>/dev/null || echo "  ❌ Python not found"
@@ -94,7 +94,7 @@ clean:
 # Generate human-friendly deliverables from Parquet data
 deliverables:
 	@echo "📂 Generating deliverables from data/processed/..."
-	uv run python scripts/generate_deliverables.py
+	@PYTHONPATH=. uv run python scripts/generate_deliverables.py
 
 # Clean derived deliverables (can be regenerated)
 clean-deliverables:

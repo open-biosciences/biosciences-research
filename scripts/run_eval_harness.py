@@ -37,10 +37,18 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from ragas import EvaluationDataset, RunConfig, evaluate
-from ragas.metrics import Faithfulness, ResponseRelevancy, ContextPrecision, LLMContextRecall
+from ragas.metrics import (
+    Faithfulness,
+    ResponseRelevancy,
+    ContextPrecision,
+    LLMContextRecall,
+)
 from ragas.llms import LangchainLLMWrapper
 
-from src.utils import load_documents_from_huggingface, load_golden_testset_from_huggingface
+from src.utils import (
+    load_documents_from_huggingface,
+    load_golden_testset_from_huggingface,
+)
 from src.config import create_vector_store, get_llm
 from src.retrievers import create_retrievers
 from src.graph import build_all_graphs
@@ -58,7 +66,7 @@ parser.add_argument(
     type=str,
     default="false",
     choices=["true", "false"],
-    help="Recreate Qdrant collection (true) or reuse existing (false). Default: false"
+    help="Recreate Qdrant collection (true) or reuse existing (false). Default: false",
 )
 args = parser.parse_args()
 
@@ -85,9 +93,9 @@ os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 # PRE-FLIGHT CHECKS
 # ==============================================================================
 
-print("="*80)
+print("=" * 80)
 print("RAGAS EVALUATION HARNESS (Using src/ Modules)")
-print("="*80)
+print("=" * 80)
 print(f"\nStart time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 if not os.getenv("OPENAI_API_KEY"):
@@ -111,9 +119,11 @@ if ingest_manifest_path.exists():
         "ingest_manifest_id": ingest_manifest["id"],
         "ingest_timestamp": ingest_manifest["generated_at"],
         "sources_sha256": ingest_manifest["fingerprints"]["sources"]["jsonl_sha256"],
-        "golden_testset_sha256": ingest_manifest["fingerprints"]["golden_testset"]["jsonl_sha256"],
+        "golden_testset_sha256": ingest_manifest["fingerprints"]["golden_testset"][
+            "jsonl_sha256"
+        ],
         "source_pdfs_count": ingest_manifest["params"]["MAX_DOCS"] or "all",
-        "ragas_testset_size": ingest_manifest["params"]["TESTSET_SIZE"]
+        "ragas_testset_size": ingest_manifest["params"]["TESTSET_SIZE"],
     }
     print(f"✓ Linked to ingestion manifest: {ingest_manifest['id'][:8]}...")
 else:
@@ -124,9 +134,9 @@ else:
 # LOAD DATA
 # ==============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("STEP 1: LOADING DATA")
-print("="*80)
+print("=" * 80)
 
 print(f"\nLoading source documents from {DATASET_SOURCES}...")
 docs = load_documents_from_huggingface(DATASET_SOURCES, "train")
@@ -143,9 +153,9 @@ print(f"  Columns: {golden_df.columns.tolist()}")
 # BUILD RAG STACK
 # ==============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("STEP 2: BUILDING RAG STACK")
-print("="*80)
+print("=" * 80)
 
 print(f"\nCreating vector store (recreate={RECREATE_COLLECTION})...")
 vs = create_vector_store(docs, recreate_collection=RECREATE_COLLECTION)
@@ -167,9 +177,9 @@ print(f"✓ Built {len(graphs)} compiled graphs")
 # RUN INFERENCE ACROSS ALL RETRIEVERS
 # ==============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("STEP 3: RUNNING INFERENCE")
-print("="*80)
+print("=" * 80)
 print(f"\nProcessing {len(golden_df)} questions × {len(graphs)} retrievers...")
 
 datasets = {}
@@ -206,9 +216,9 @@ print(f"\n✓ All inference complete! Results saved to {OUT_DIR}")
 # RAGAS EVALUATION
 # ==============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("STEP 4: RAGAS EVALUATION")
-print("="*80)
+print("=" * 80)
 print("\nMetrics: Faithfulness, Answer Relevancy, Context Precision, Context Recall")
 
 evaluator_llm = LangchainLLMWrapper(get_llm())
@@ -229,29 +239,29 @@ for name, df in datasets.items():
             Faithfulness(),
             ResponseRelevancy(),
             ContextPrecision(),
-            LLMContextRecall()
+            LLMContextRecall(),
         ],
         llm=evaluator_llm,
         run_config=run_cfg,
     )
     results[name] = res
-    print(f"   ✓ Evaluation complete")
+    print("   ✓ Evaluation complete")
 
     # Save detailed results with per-question scores
     det_file = OUT_DIR / f"{name}_evaluation_metrics.parquet"
     res.to_pandas().to_parquet(det_file, compression="zstd", index=False)
     print(f"   💾 Saved evaluation metrics: {det_file.name}")
 
-print(f"\n✓ All evaluations complete!")
+print("\n✓ All evaluations complete!")
 
 
 # ==============================================================================
 # COMPARATIVE ANALYSIS
 # ==============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("STEP 5: COMPARATIVE ANALYSIS")
-print("="*80)
+print("=" * 80)
 
 comp = []
 for name, res in results.items():
@@ -264,14 +274,16 @@ for name, res in results.items():
         "Context Recall": rdf["context_recall"].mean(),
     }
     row["Average"] = (
-        row["Faithfulness"] +
-        row["Answer Relevancy"] +
-        row["Context Precision"] +
-        row["Context Recall"]
+        row["Faithfulness"]
+        + row["Answer Relevancy"]
+        + row["Context Precision"]
+        + row["Context Recall"]
     ) / 4
     comp.append(row)
 
-comp_df = pd.DataFrame(comp).sort_values("Average", ascending=False).reset_index(drop=True)
+comp_df = (
+    pd.DataFrame(comp).sort_values("Average", ascending=False).reset_index(drop=True)
+)
 
 # Save comparative table
 comp_parquet = OUT_DIR / "comparative_ragas_results.parquet"
@@ -279,42 +291,52 @@ comp_df.to_parquet(comp_parquet, compression="zstd", index=False)
 print(f"\n💾 Saved comparative results: {comp_parquet.name}")
 
 # Display results
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("COMPARATIVE RAGAS RESULTS")
-print("="*80)
+print("=" * 80)
 print()
 print(comp_df.to_string(index=False, float_format=lambda x: f"{x:.4f}"))
 print()
 
 # Find winner
 winner = comp_df.iloc[0]
-baseline = comp_df[comp_df["Retriever"] == "Naive"].iloc[0] if "Naive" in comp_df["Retriever"].values else None
+baseline = (
+    comp_df[comp_df["Retriever"] == "Naive"].iloc[0]
+    if "Naive" in comp_df["Retriever"].values
+    else None
+)
 
 if baseline is not None and winner["Retriever"] != "Naive":
-    improvement = ((winner["Average"] - baseline["Average"]) / baseline["Average"]) * 100
-    print(f"🏆 Winner: {winner['Retriever']} with {winner['Average']:.2%} average score")
+    improvement = (
+        (winner["Average"] - baseline["Average"]) / baseline["Average"]
+    ) * 100
+    print(
+        f"🏆 Winner: {winner['Retriever']} with {winner['Average']:.2%} average score"
+    )
     print(f"   Improvement over baseline: +{improvement:.1f}%")
 else:
-    print(f"🏆 Best performer: {winner['Retriever']} with {winner['Average']:.2%} average score")
+    print(
+        f"🏆 Best performer: {winner['Retriever']} with {winner['Average']:.2%} average score"
+    )
 
 
 # ==============================================================================
 # SUMMARY
 # ==============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("EVALUATION SUMMARY")
-print("="*80)
+print("=" * 80)
 
 print(f"""
-End time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+End time: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
 Test Set:
   - Dataset: {DATASET_GOLDEN}
   - Questions: {len(golden_df)}
 
 Retrievers Evaluated:
-  {', '.join(datasets.keys())}
+  {", ".join(datasets.keys())}
 
 Output Files ({OUT_DIR}):
   - Evaluation inputs: {len(datasets)} × *_evaluation_inputs.parquet (6 columns: RAG outputs)
@@ -335,9 +357,9 @@ All results saved to: {OUT_DIR.absolute()}
 # GENERATE RUN MANIFEST FOR REPRODUCIBILITY
 # ==============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("STEP 6: GENERATING RUN MANIFEST")
-print("="*80)
+print("=" * 80)
 
 # Import from src.utils package
 from src.utils import generate_run_manifest
@@ -346,21 +368,16 @@ manifest_path = OUT_DIR / "RUN_MANIFEST.json"
 manifest = generate_run_manifest(
     output_path=manifest_path,
     evaluation_results=results,
-    retrievers_config={
-        "naive": {"graph": graphs["naive"], "k": K},
-        "bm25": {"graph": graphs["bm25"], "k": K},
-        "ensemble": {"graph": graphs["ensemble"], "k": K},
-        "cohere_rerank": {"graph": graphs["cohere_rerank"], "k": K}
-    },
-    data_provenance=data_provenance
+    retrievers_config={name: {"graph": g, "k": K} for name, g in graphs.items()},
+    data_provenance=data_provenance,
 )
 
 print(f"\n💾 Saved run manifest: {manifest_path.name}")
 print(f"   ✓ RAGAS version: {manifest['ragas_version']}")
 print(f"   ✓ Python version: {manifest['python_version']}")
 print(f"   ✓ Retriever configs: {len(manifest['retrievers'])}")
-print(f"   ✓ Evaluation settings captured")
+print("   ✓ Evaluation settings captured")
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("✅ EVALUATION COMPLETE")
-print("="*80)
+print("=" * 80)

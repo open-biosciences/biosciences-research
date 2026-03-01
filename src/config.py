@@ -20,23 +20,25 @@ from dotenv import load_dotenv
 load_dotenv(override=not os.getenv("CI"))
 
 # ---------- Configuration from environment variables ----------
-QDRANT_URL = os.getenv("QDRANT_URL", os.getenv("QDRANT_API_URL"))                 # prefer this if set
-QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")   # fallback path
+QDRANT_URL = os.getenv("QDRANT_URL", os.getenv("QDRANT_API_URL"))  # prefer this if set
+QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")  # fallback path
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", "6333"))
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY") or None
 
-OPENAI_API_KEY   = os.getenv("OPENAI_API_KEY")
-COHERE_API_KEY   = os.getenv("COHERE_API_KEY")
-HF_TOKEN         = os.getenv("HF_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+HF_TOKEN = os.getenv("HF_TOKEN")
 
 LANGSMITH_PROJECT = os.getenv("LANGSMITH_PROJECT")
 LANGSMITH_TRACING = os.getenv("LANGSMITH_TRACING")
 LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
 
-COLLECTION_NAME= os.getenv("QDRANT_COLLECTION")
-OPENAI_MODEL_NAME = os.getenv("OPENAI_MODEL_NAME")
-EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME")
+COLLECTION_NAME = os.getenv("QDRANT_COLLECTION", "biosciences-data-sources")
+OPENAI_MODEL_NAME = os.getenv("OPENAI_MODEL_NAME", "gpt-4.1-mini")
+EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "text-embedding-3-small")
+COHERE_RERANK_MODEL = os.getenv("COHERE_RERANK_MODEL", "rerank-v3.5")
 # ----------------------------------------
+
 
 @lru_cache(maxsize=1)
 def get_llm():
@@ -65,14 +67,14 @@ def get_qdrant():
     """
     URL-first convention. If QDRANT_URL is set, use it.
     Otherwise fall back to host/port. Only pass api_key if provided.
-    
+
     Get cached Qdrant client instance.
 
     Returns:
         QdrantClient connected to configured URL or host/port
     """
     kwargs = {}
-    if QDRANT_API_KEY:          # avoid passing empty key (breaks docker default)
+    if QDRANT_API_KEY:  # avoid passing empty key (breaks docker default)
         kwargs["api_key"] = QDRANT_API_KEY
 
     if QDRANT_URL:
@@ -93,7 +95,7 @@ def get_collection_name() -> str:
 def create_vector_store(
     documents: List[Document],
     collection_name: str = None,
-    recreate_collection: bool = False
+    recreate_collection: bool = False,
 ) -> QdrantVectorStore:
     """
     Create and populate Qdrant vector store.
