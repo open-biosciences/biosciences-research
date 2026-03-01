@@ -13,8 +13,9 @@ from typing import Dict, List
 from typing_extensions import NotRequired
 
 from langchain.agents import AgentState, create_agent
-from langchain.agents.middleware import ModelRequest, dynamic_prompt
+from langchain.agents.middleware import before_model
 from langchain_core.documents import Document
+from langchain_core.messages import SystemMessage
 
 from src.config import get_llm
 from src.prompts import SYSTEM_PROMPT
@@ -71,15 +72,17 @@ def build_graph(retriever, llm=None, prompt_template: str = None):
     if prompt_template is None:
         prompt_template = SYSTEM_PROMPT
 
-    @dynamic_prompt
-    def retrieve_and_inject(request: ModelRequest) -> str:
-        """Retrieve docs for the latest user message and build system prompt."""
-        last_msg = request.state["messages"][-1]
+    @before_model(state_schema=RAGState)
+    def retrieve_and_inject(state, runtime):
+        """Retrieve docs for the latest user message and inject as system prompt."""
+        last_msg = state["messages"][-1]
         query = last_msg.content if hasattr(last_msg, "content") else str(last_msg)
         docs = retriever.invoke(query)
-        request.state["context"] = docs
         docs_content = "\n\n".join(d.page_content for d in docs)
-        return f"{prompt_template}\n\nContext:\n{docs_content}"
+        system_msg = SystemMessage(
+            content=f"{prompt_template}\n\nContext:\n{docs_content}"
+        )
+        return {"context": docs, "messages": [system_msg]}
 
     return create_agent(
         llm, tools=[], middleware=[retrieve_and_inject], state_schema=RAGState

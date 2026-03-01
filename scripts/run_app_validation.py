@@ -300,10 +300,12 @@ def run_functional_tests(components: Optional[Dict[str, Any]]) -> Dict[str, bool
 
     print_info(f"Test question: '{test_question}'")
 
+    from src.graph import invoke_for_benchmark
+
     for retriever_name, graph in components["graphs"].items():
         try:
-            # Execute graph
-            result = graph.invoke({"question": test_question})
+            # Execute graph via benchmark adapter
+            result = invoke_for_benchmark(graph, test_question)
 
             # Validate result structure
             assert "question" in result, "Missing 'question' in result"
