@@ -1,0 +1,130 @@
+{
+  "ragas_version": "0.2.10",
+  "python_version": "3.13",
+  "llm": {
+    "model": "gpt-4.1-mini",
+    "temperature": 0,
+    "provider": "openai",
+    "purpose": "RAG generation and RAGAS evaluation"
+  },
+  "embeddings": {
+    "model": "text-embedding-3-small",
+    "dimensions": 1536,
+    "provider": "openai",
+    "purpose": "Document and query embeddings"
+  },
+  "retrievers": [
+    {
+      "name": "naive",
+      "type": "dense_vector_search",
+      "description": "Baseline dense vector search with OpenAI embeddings",
+      "k": 5,
+      "distance_metric": "cosine",
+      "rerank": false
+    },
+    {
+      "name": "bm25",
+      "type": "sparse_keyword",
+      "description": "BM25 sparse keyword matching (lexical)",
+      "k": 5,
+      "rerank": false
+    },
+    {
+      "name": "cohere_rerank",
+      "type": "contextual_compression",
+      "description": "Cohere rerank-v3.5 with contextual compression",
+      "initial_k": 20,
+      "top_n": 3,
+      "rerank_model": "rerank-v3.5",
+      "rerank_provider": "cohere",
+      "rerank": true
+    },
+    {
+      "name": "ensemble",
+      "type": "hybrid",
+      "description": "Ensemble combining dense vector + sparse keyword",
+      "dense_k": 5,
+      "sparse_k": 5,
+      "weights": [
+        0.5,
+        0.5
+      ],
+      "components": [
+        "naive_dense",
+        "bm25_sparse"
+      ],
+      "rerank": false
+    }
+  ],
+  "evaluation": {
+    "golden_testset": "open-biosciences/biosciences-golden-testset",
+    "golden_testset_size": 12,
+    "source_dataset": "open-biosciences/biosciences-sources",
+    "source_dataset_size": 38,
+    "metrics": [
+      "faithfulness",
+      "answer_relevancy",
+      "context_precision",
+      "context_recall"
+    ],
+    "timeout_seconds": 360,
+    "ragas_run_config": {
+      "timeout": 360,
+      "max_workers": 4
+    }
+  },
+  "vector_store": {
+    "type": "qdrant",
+    "collection_name": "biosciences-data-sources",
+    "host": "https://1d48094c-93af-4f43-8a71-8ffd45883525.us-west-1-0.aws.cloud.qdrant.io",
+    "port": 6333,
+    "distance": "cosine",
+    "vector_size": 1536
+  },
+  "skipped": [],
+  "notes": [
+    "All LLM calls use temperature=0 for determinism",
+    "Fine-tuned embeddings out of scope per instructor guidance",
+    "Evaluation follows RAGAS 0.2.10 API patterns from session08"
+  ],
+  "generated_at": "2026-03-01T06:21:48.383365Z",
+  "generated_by": "scripts/generate_run_manifest.py",
+  "results_summary": {
+    "naive": {
+      "faithfulness": 0.9257811399329956,
+      "answer_relevancy": 0.8888729193928951,
+      "context_precision": 0.6831018518251987,
+      "context_recall": 0.777281746031746,
+      "average": 0.8187594142957089
+    },
+    "bm25": {
+      "faithfulness": 0.8600973824077539,
+      "answer_relevancy": 0.9644566875946076,
+      "context_precision": 0.8354166666331423,
+      "context_recall": 0.9325396825396824,
+      "average": 0.8981276047937965
+    },
+    "ensemble": {
+      "faithfulness": 0.949698395919326,
+      "answer_relevancy": 0.9679530383887543,
+      "context_precision": 0.7657728646798764,
+      "context_recall": 0.9603174603174603,
+      "average": 0.9109354398263543
+    },
+    "cohere_rerank": {
+      "faithfulness": 0.9044394866331443,
+      "answer_relevancy": 0.9656516317453839,
+      "context_precision": 0.9166666666277776,
+      "context_recall": 0.8392857142857143,
+      "average": 0.9065108748230051
+    }
+  },
+  "data_provenance": {
+    "ingest_manifest_id": "ragas_pipeline_0624a7bd-6751-4034-92f7-80c9fc84522f",
+    "ingest_timestamp": "2026-03-01T06:06:28.848963Z",
+    "sources_sha256": "78d5a84e23a949f88f259c8ef8a82179fa85b85218f1af2de467a4b3a466e51a",
+    "golden_testset_sha256": "f7307a55c4ca61f7cd709ea9cf01844d6b37335305aefd23cb696ed456e6c003",
+    "source_pdfs_count": "all",
+    "ragas_testset_size": 10
+  }
+}

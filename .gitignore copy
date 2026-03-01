@@ -1,0 +1,25 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+# sample_code/
+
+.env
+!.env.example
+
+# python cache files
+*.pyc
+
+# LangGraph runtime files
+.langgraph_api/
+
+# ignore pickle files
+*.pkl
+*.pckl
+.langgraph_api/.langgraph_ops.pckl

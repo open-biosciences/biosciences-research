@@ -1,0 +1,31 @@
+{
+    "name": "gdelt-langgraph",
+    "python_version": "3.11",
+    "image_distro": "wolfi",
+    "dependencies": [
+        ".",
+        "langgraph==0.6.7",
+        "langgraph-cli>=0.4.4",
+        "langchain>=0.3.19",
+        "langchain-experimental>=0.3.4",
+        "langchain-openai>=0.3.7",
+        "langchain-cohere==0.4.4",
+        "cohere==5.12.0",
+        "langchain-qdrant>=0.2.0",
+        "qdrant-client>=1.13.2",
+        "rank-bm25>=0.2.2",
+        "pymupdf>=1.26.3",
+        "rapidfuzz>=3.14.1",
+        "huggingface-hub>=0.26.0",
+        "datasets>=3.2.0"
+    ],
+    "env": {
+        "QDRANT_URL": "http://localhost:6333",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "COHERE_API_KEY": "${COHERE_API_KEY}",
+        "LANGSMITH_API_KEY": "${LANGSMITH_API_KEY}"
+    },
+    "graphs": {
+        "gdelt": "app.graph_app:get_app"
+    }
+}

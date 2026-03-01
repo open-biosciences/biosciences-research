@@ -1,0 +1,78 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "page_content": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "metadata": {
+      "author": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "creationDate": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "creationdate": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "creator": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "file_path": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "format": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "keywords": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "modDate": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "moddate": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "page": {
+        "dtype": "int64",
+        "_type": "Value"
+      },
+      "producer": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "source": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "subject": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "title": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "total_pages": {
+        "dtype": "int64",
+        "_type": "Value"
+      },
+      "trapped": {
+        "dtype": "string",
+        "_type": "Value"
+      }
+    }
+  },
+  "homepage": "",
+  "license": ""
+}

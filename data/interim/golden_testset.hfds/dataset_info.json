@@ -1,0 +1,27 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "user_input": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "reference_contexts": {
+      "feature": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "_type": "List"
+    },
+    "reference": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "synthesizer_name": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": ""
+}
