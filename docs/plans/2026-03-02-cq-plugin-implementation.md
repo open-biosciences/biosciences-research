@@ -4,7 +4,7 @@
 
 **Goal:** Add `/ob-cq-discover` and `/ob-cq-run` commands to the bio-research plugin with local file persistence instead of Graphiti.
 
-**Architecture:** Two commands in `open-biosciences-plugins/bio-research/commands/` backed by two existing skills (`cq-discover` and `biosciences-cq-runner`). The CQ runner delegates execution to the `biosciences-graph-builder` skill and persists results to local `.ob-cq/` directory files. No Graphiti dependency.
+**Architecture:** Two commands in `open-biosciences-plugins/bio-research/commands/` backed by two existing skills (`biosciences-cq-discover` and `biosciences-cq-runner`). The CQ runner delegates execution to the `biosciences-graph-builder` skill and persists results to local `.ob-cq/` directory files. No Graphiti dependency.
 
 **Tech Stack:** Markdown skill files (no Python code), HuggingFace datasets library, DuckDB `hf://` protocol, biosciences-mcp gateway.
 
@@ -29,7 +29,7 @@ argument-hint: "[filter | cq_id | --analysis]"
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
 
-You are browsing the competency questions catalog using the `cq-discover` skill. This command loads CQ definitions from the `open-biosciences/biosciences-competency-questions-sample` HuggingFace dataset and presents them in three modes: summary table, filtered list, or detailed single-CQ view.
+You are browsing the competency questions catalog using the `biosciences-cq-discover` skill. This command loads CQ definitions from the `open-biosciences/biosciences-competency-questions-sample` HuggingFace dataset and presents them in three modes: summary table, filtered list, or detailed single-CQ view.
 
 ## Usage
 
@@ -55,7 +55,7 @@ Determine the mode from `$ARGUMENTS`:
 
 ### Step 2: Execute Query
 
-Use the `cq-discover` skill to load data from HuggingFace via DuckDB and render the appropriate output.
+Use the `biosciences-cq-discover` skill to load data from HuggingFace via DuckDB and render the appropriate output.
 
 ### Step 3: Offer Next Steps
 
@@ -270,10 +270,10 @@ The complete rewritten SKILL.md content is provided in the implementation (too l
 
 ---
 
-### Task 5: Update `cq-discover/SKILL.md`
+### Task 5: Update `biosciences-cq-discover/SKILL.md`
 
 **Files:**
-- Modify: `open-biosciences-plugins/bio-research/skills/cq-discover/SKILL.md`
+- Modify: `open-biosciences-plugins/bio-research/skills/biosciences-cq-discover/SKILL.md`
 
 **Changes:**
 
@@ -305,7 +305,7 @@ The complete rewritten SKILL.md content is provided in the implementation (too l
 Run from `open-biosciences-plugins/`:
 ```bash
 git add bio-research/commands/ob-cq-discover.md bio-research/commands/ob-cq-run.md
-git add bio-research/skills/biosciences-cq-runner/SKILL.md bio-research/skills/cq-discover/SKILL.md
+git add bio-research/skills/biosciences-cq-runner/SKILL.md bio-research/skills/biosciences-cq-discover/SKILL.md
 git rm bio-research/commands/ob-cq.md
 ```
 

@@ -15,12 +15,12 @@ Add two commands to the existing `bio-research` plugin for discovering and execu
 
 | Command | Skill | Purpose |
 |---------|-------|---------|
-| `/ob-cq-discover` | `cq-discover` | Browse, filter, and inspect CQs from the HuggingFace dataset |
+| `/ob-cq-discover` | `biosciences-cq-discover` | Browse, filter, and inspect CQs from the HuggingFace dataset |
 | `/ob-cq-run` | `biosciences-cq-runner` | Load a CQ definition and execute it via graph-builder |
 
 ## Architecture
 
-### cq-discover
+### biosciences-cq-discover
 
 Zero-dependency browsing of the 15 CQs. Three modes:
 
@@ -86,11 +86,11 @@ Structured entry point that loads a CQ definition and delegates execution to the
 
 | File | Action | Description |
 |------|--------|-------------|
-| `commands/ob-cq-discover.md` | Create (rename from `ob-cq.md`) | Command frontmatter pointing to cq-discover skill |
+| `commands/ob-cq-discover.md` | Create (rename from `ob-cq.md`) | Command frontmatter pointing to biosciences-cq-discover skill |
 | `commands/ob-cq-run.md` | Create | Command frontmatter for CQ execution |
 | `commands/ob-cq.md` | Delete | Replaced by `ob-cq-discover` and `ob-cq-run` |
 | `skills/biosciences-cq-runner/SKILL.md` | Rewrite | Remove Graphiti dependency, add local persistence, reframe as graph-builder delegation |
-| `skills/cq-discover/SKILL.md` | Review | Minor consistency updates if needed |
+| `skills/biosciences-cq-discover/SKILL.md` | Review | Minor consistency updates if needed |
 
 ## Validation
 
