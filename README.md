@@ -7,10 +7,9 @@ Part of the [Open Biosciences](https://github.com/open-biosciences) multi-repo p
 
 ## Status
 
-**Wave 4 (Validation) — Not Started.** Content will be migrated from the predecessor
-`lifesciences-research` repo once Wave 4 begins. Prerequisites (Waves 2 and 3) are complete.
+**Wave 4 (Validation) — In Progress.** Competency questions catalog and research docs have been migrated from the predecessor `lifesciences-research` repo (34 files in 4 directories, commit `13c64b0`). Prerequisites (Waves 2 and 3) are complete.
 
-## What Will Be Here
+## What This Repo Contains
 
 Content migrated from `lifesciences-research/docs/`:
 
@@ -47,8 +46,8 @@ Supporting documentation and background literature for research question domains
 ## What Is NOT Here
 
 SpecKit process artifacts (`specs/`, `.specify/`, SpecKit prompt docs) are **not** in this
-repo. Per AGE-183, those are architectural governance artifacts owned by the Platform Architect
-and live in [biosciences-architecture](https://github.com/open-biosciences/biosciences-architecture).
+repo. Per AGE-183 and AGE-184, those are governance artifacts and live in
+[biosciences-program](https://github.com/open-biosciences/biosciences-program).
 
 ## Owner
 
@@ -63,7 +62,7 @@ Research Workflows Engineer (Agent 6)
 
 ## Related Repos
 
-- [biosciences-architecture](https://github.com/open-biosciences/biosciences-architecture) — ADRs, SpecKit artifacts, governance docs
+- [biosciences-program](https://github.com/open-biosciences/biosciences-program) — ADRs, SpecKit artifacts, governance docs
 - [biosciences-deepagents](https://github.com/open-biosciences/biosciences-deepagents) — LangGraph agents that execute research tasks
 - [biosciences-evaluation](https://github.com/open-biosciences/biosciences-evaluation) — Quality metrics for research output accuracy
 - [biosciences-program](https://github.com/open-biosciences/biosciences-program) — Migration tracking and cross-repo coordination
