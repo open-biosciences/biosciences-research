@@ -1,6 +1,6 @@
 # Makefile for Biosciences Research RAG
 
-.PHONY: help validate eval deliverables ingest publish-interim publish-processed clean clean-deliverables clean-processed clean-all env docker-up docker-down test notebook dev
+.PHONY: help validate eval deliverables ingest ingest-cq publish-interim publish-processed publish-cq clean clean-deliverables clean-processed clean-all env docker-up docker-down test notebook dev
 
 # Default target
 help:
@@ -8,6 +8,7 @@ help:
 	@echo ""
 	@echo "Data Preparation (one-time setup):"
 	@echo "  make ingest      - Extract PDFs and generate golden testset (~5-10 min, \$$2-3)"
+	@echo "  make ingest-cq   - Extract competency questions into structured dataset"
 	@echo ""
 	@echo "Development:"
 	@echo "  make dev         - Start LangGraph dev server (4 RAG strategies)"
@@ -20,6 +21,7 @@ help:
 	@echo "Publishing (optional, requires HF_TOKEN):"
 	@echo "  make publish-interim    - Upload sources & golden testset to HuggingFace Hub"
 	@echo "  make publish-processed  - Upload evaluation results to HuggingFace Hub"
+	@echo "  make publish-cq         - Upload competency questions to HuggingFace Hub"
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  make clean       - Clean Python cache and temporary files"
@@ -135,6 +137,22 @@ notebook:
 	@echo "📓 Starting Jupyter notebook..."
 	jupyter notebook
 
+# Extract competency questions into structured dataset
+ingest-cq:
+	@echo "Extracting competency questions into structured dataset..."
+	@echo ""
+	@echo "Parses docs/competency-questions-catalog.md (15 CQs)"
+	@echo "  + docs/competency-questions-paul.md (12 CQs)"
+	@echo "  + docs/competency-validations/*.md (validation status)"
+	@echo ""
+	@echo "Outputs to data/interim/:"
+	@echo "  - cq_questions.parquet (27 rows)"
+	@echo "  - cq_entities.parquet (~48 rows)"
+	@echo "  - cq_gold_graphs.parquet (15 rows)"
+	@echo "  - cq_manifest.json"
+	@echo ""
+	@PYTHONPATH=. uv run python scripts/extract_competency_questions.py
+
 # Data preparation (one-time ingestion from raw PDFs)
 ingest:
 	@echo "📄 Ingesting raw PDFs and generating golden testset..."
@@ -156,6 +174,15 @@ publish-interim:
 	@echo "  - open-biosciences/biosciences-golden-testset (12 QA pairs)"
 	@echo ""
 	@PYTHONPATH=. uv run python scripts/publish_interim_datasets.py
+
+# Publish competency questions dataset to HuggingFace Hub
+publish-cq:
+	@echo "Publishing competency questions to HuggingFace Hub..."
+	@echo ""
+	@echo "Uploads to HuggingFace Hub:"
+	@echo "  - open-biosciences/biosciences-competency-questions (3 splits)"
+	@echo ""
+	@PYTHONPATH=. uv run python scripts/publish_cq_dataset.py
 
 # Publish processed evaluation results to HuggingFace Hub
 publish-processed:

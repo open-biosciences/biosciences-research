@@ -1,8 +1,6 @@
 # Competency Questions Catalog
 
-**Purpose**: Research questions for building knowledge graphs using the `lifesciences-graph-builder` skill.
-
-**Target**: Use `graphiti-docker` for development/testing.
+**Purpose**: Research questions for building knowledge graphs using the `biosciences-graph-builder` skill.
 
 ---
 
